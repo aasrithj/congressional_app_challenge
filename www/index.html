@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>HealthSync - 2026 Congressional App Challenge</title>
+    <link rel="icon" href="./images/logo.svg" type="image/svg+xml" sizes="any">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
@@ -11,7 +12,35 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    
+    <!-- Parent Viewport Screen -->
+    <div class="viewport" id="viewport-id">
+        <div class="frame" id="frame-id">
+            <!-- Navbar -->
+            <nav class="navbar-parent">
+                <div class="navbar-content">
+                    <!-- Navbar Logo -->
+                    <a href="/" class="logo-parent">
+                        <img src="./images/logo.svg" class="logo-child" alt="HealthSync Logo" width="100" height="100">
+                    </a>
+                    <!-- Navbar Links -->
+                     <ul class="nav-links" id="nav-links">
+                        <li><a href="#today">Today</a></li>
+                        <li><a href="#sources">Sources</a></li>
+                        <li><a href="#settings"><b>Settings</b></a></li>
+                     </ul>
+                    <!-- Navbar Hamburger Menu -->
+                    <div class="hamburger-parent">
+                        <button class="hamburger-child" id="hamburger-button" aria-label="Toggle navigation menu" aria-controls="nav-links" aria-expanded="false">
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
