@@ -1,10 +1,19 @@
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-html {
+html,
+body {
+    margin: 0;
+    height: 100%;
     scroll-behavior: smooth;
     scroll-padding-top: 100px;
+}
+
+body {
+    background: #e4e4e4;
+    font-family: 'Outfit', 'Manrope', sans-serif;
+    display: flex;
 }
