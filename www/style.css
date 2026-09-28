@@ -18,3 +18,11 @@ body {
     display: flex;
 }
 
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 1rem 2rem;
+    color: white;
+}
