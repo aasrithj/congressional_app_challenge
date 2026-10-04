@@ -1,93 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>HealthSync - 2026 Congressional App Challenge</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./images/logo.svg" type="image/svg+xml" sizes="any">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- 
-    ================
-    FIX THIS BELOW ↓
-    ================
-    -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <!-- Parent Viewport Screen -->
     <div class="viewport" id="viewport-id">
         <div class="frame" id="frame-id">
-            <!-- Navbar -->
-            <nav class="navbar-parent">
-                <div class="navbar-content">
-                    <!-- Navbar Logo -->
-                    <a href="/" class="logo-parent">
-                        <img src="./images/logo.svg" class="logo-child" alt="HealthSync Logo" width="100" height="100">
-                    </a>
-                    <!-- Navbar Links -->
-                     <ul class="nav-links" id="nav-links"></ul>
-                        <li><a href="#today" onclick="goToTab('screen-today')">Today</a></li>
-                        <li><a href="#sources" onclick="goToTab('screen-sources')">Sources</a></li>
-                        <li><a href="#settings" onclick="goToTab('screen-settings')"><b>Settings</b></a></li>
-                     </ul>
-                    <!-- Navbar Hamburger Menu -->
-                    <div class="hamburger-parent">
-                        <button class="hamburger-child" id="hamburger-button" aria-label="Toggle Navigation Menu" aria-controls="nav-links" aria-expanded="false" onclick="toggleMenu()">
-                            <span class="bar"></span>
-                            <span class="bar"></span>
-                            <span class="bar"></span>
-                        </button>
+            <!-- Scroll-Compatible Area -->
+            <div class="scroll-area-app" id="scroll-area">
+                <!-- Navbar -->
+                <nav class="navbar-parent">
+                    <div class="navbar-content">
+                        <!-- Navbar Logo -->
+                        <a href="./index.html" class="logo-parent">
+                            <img src="./images/logo.svg" class="logo-child" alt="HealthSync Logo" width="60" height="60">
+                        </a>
+                        <!-- Navbar Links -->
+                        <ul class="nav-links" id="nav-links">
+                            <li class="nav-child"><a href="#today" onclick="goToTab('screen-today')">Today</a></li>
+                            <li class="nav-child"><a href="#sources" onclick="goToTab('screen-sources')">Sources</a></li>
+                            <li class="nav-child"><a href="#settings" onclick="goToTab('screen-settings')"><b>Settings</b></a></li>
+                        </ul>
+                        <!-- Navbar Hamburger Menu -->
+                        <div class="hamburger-parent">
+                            <button class="hamburger-child" id="hamburger-button" aria-label="Toggle Navigation Menu" aria-controls="nav-links" aria-expanded="false" onclick="toggleMenu()">
+                                <span class="bar"></span>
+                                <span class="bar"></span>
+                                <span class="bar"></span>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </nav>
-        </div>
-        <!-- Scroll-Compatible Area -->
-        <div class="scroll-area-app" id="scroll-area">
-            <!-- Hero Section -->
-            <section class="hero-section" id="hero-section">
-                <div class="top-subheading">
-                    <p class="subheading-child">Safe Air, Right Care, <br>Everyday.<br></p>
-                </div>
-                <div class="top-heading">
-                    <h1 class="heading-child">Take Control<br><span class="your-day-text">of Your Day</span></h1>
-                </div>
-                <div class="top-description">
-                    <p class="description-child">HealthSync builds a personalized schedule of the safest hours to step outside, aligning with your specific medical conditions and atmospheric environment.</p>
+                </nav>
+                <!-- Hero Section -->
+                <div class="hero-section" id="hero-section">
+                    <div class="top-subheading">
+                        <p class="subheading-child">Safe Air, Right Care, <span class="everyday-text">Everyday</span>.</p>
+                    </div>
+                    <div class="top-heading">
+                        <h1 class="heading-child">Take Control<br><span class="your-day-text">of Your Day</span></h1>
+                    </div>
+                    <div class="top-description">
+                        <p class="description-child">HealthSync builds a personalized schedule of the safest hours to step outside, aligning with your specific medical conditions and atmospheric environment.</p>
+                    </div>
                 </div>
                 <!-- Hero Cards -->
-                <div class="parent-cards" id="parent-cards" aria-label="Medical Conditions Container">
+                <div class="parent-cards" id="parent-cards">
                     <div class="card-1">
-                        <h1 class="Asthma"></h1>
+                        <h1 class="asthma">Asthma</h1>
                     </div>
                     <div class="card-2">
-                        <h1 class="Migraine"></h1>
+                        <h1 class="migraine">Migraine</h1>
                     </div>
                     <div class="card-3">
-                        <h1 class="Eczema"></h1>
+                        <h1 class="eczema">Eczema</h1>
                     </div>
                 </div>
                 <!-- Dotted Line Separator -->
-                <div class="separator-element" aria-label="Horizontal Dotted Line">
+                <div class="separator-element">
                     <hr class="horizontal-dotted-line">
                 </div>
                 <!-- Let's Start Button -->
                  <div class="lets-start-button">
                     <button class="btn-primary" onclick="goTo('screen-setup-conditions')">Let&rsquo;s Start</button>
                  </div>
-            </section>
+                </div>
             <!-- Section 2 -->
-            <section class="step-1-section" id="step-1-section">
+            <div class="step-1-section" id="step-1-section">
                 <!-- 
                 ==============
                 FILL CODE HERE
                 ==============
                 -->
-            </section>
+            </div>
+            </div>
         </div>
-    </div>
     <!-- JavaScript Link -->
     <script src="script.js"></script>
 </body>
