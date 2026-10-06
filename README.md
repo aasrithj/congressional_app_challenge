@@ -1,4 +1,4 @@
-![Logo of HealthSync](./images/healthsyncpicture.png)
+![Logo of HealthSync](./www/images/healthsyncpicture.png)
 
 # congressional_app_challenge
 
