@@ -1,3 +1,5 @@
+![Logo of HealthSync](/www/images/healthsyncpicture.png)
+
 # congressional_app_challenge
 
 This is the project repository for the 2026 Congressional App Challenge, involving the team members Aasrith Jangala (myself), Mithun Sethuraman, Koundinya Namuduri, and Advaith Atulasimha.
