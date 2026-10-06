@@ -1,4 +1,4 @@
-![Logo of HealthSync](./www/images/healthsyncpicture.png)
+<img src="./www/images/healthsyncpicture.png" alt="Logo of HealthSync" style="border-radius: 10px;">
 
 # congressional_app_challenge
 
