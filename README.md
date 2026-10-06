@@ -1,4 +1,4 @@
-<img src="./www/images/healthsyncpicture.png" alt="Logo of HealthSync" style="border-radius: 10px;">
+<img src="./www/images/healthsyncpicture.png" alt="Logo of HealthSync" style="border-radius: 30px;">
 
 # congressional_app_challenge
 
