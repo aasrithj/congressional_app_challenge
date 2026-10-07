@@ -16,7 +16,6 @@ body {
     background: #e4e4e4;
     font-family: 'Outfit', 'Manrope', sans-serif;
     -webkit-font-smoothing: antialiased;
-    display: flex;
 }
 
 button {
@@ -27,6 +26,7 @@ button {
     min-height: 100vh;
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 20px 0;
 }
 
@@ -41,13 +41,58 @@ button {
     flex-direction: column;
 }
 
-.nav-links a {
-    text-decoration: none;
-    color: #ffffff;
+.hamburger-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-right: 8px;
+    width: 40px;
+    border-radius: 0.5rem;
+    height: 40px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.nav-links li {
-    list-style: none;
+.hamburger-child:hover {
+    background-color: #f0f0f0;
+}
+
+.hamburger-child:hover .bar {
+    background-color: #272727;
+}
+
+.hamburger-child .bar {
+    display: block;
+    width: 25px;
+    height: 4px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.nav-links.open {
+    max-height: 200px;
+    opacity: 1;
+}
+
+.nav-links {
+    position: absolute;
+    top: 100%;
+    right: 16px;
+    margin-top: -0.5rem;
+    background: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.2s ease;
 }
 
 .navbar-content {
@@ -63,6 +108,31 @@ button {
     z-index: 20;
 }
 
+.nav-links a {
+    display: block;
+    text-decoration: none;
+    color: #ffffff;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #161616;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover {
+    background: #EDEDED;
+}
+
+.nav-links li {
+    list-style: none;
+}
+
+#hero-section {
+    margin-top: 2.5rem;
+}
+
 .top-subheading {
     display: flex;
     justify-content: center;
@@ -72,7 +142,7 @@ button {
 }
 
 .subheading-child {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: #505050;
     font-weight: 450;
 }
@@ -90,7 +160,7 @@ button {
 }
 
 .heading-child {
-    font-size: 3rem;
+    font-size: 3.2rem;
     color: #9E9E9E;
     font-weight: 700;
 }
@@ -116,6 +186,10 @@ button {
     line-height: 1.5rem;
 }
 
+#parent-cards-and-circle-element {
+    margin-top: 2.5rem;
+}
+
 .card-1, .card-2, .card-3 {
     border-radius: 15px;
     padding: 26px;
@@ -128,6 +202,7 @@ button {
 
 .card-3 {
     width: 43%;
+    margin: -1.3rem auto 2rem auto;
 }
 
 .asthma, .migraine, .eczema {
@@ -159,12 +234,21 @@ button {
 
 .circle-child {
     position: absolute;
-    top: 60.5%;
+    top: 64%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
-/* SPACE FOR OLDER CODE (CARDS & HORIZONTAL LINE) */
+.horizontal-dotted-line {
+    width: 90%; 
+    margin: 2.5rem auto 2rem; 
+    border: none; 
+    height: 4px;
+    background-image: radial-gradient(circle, #515151 2px, transparent 1px);
+    opacity: 0.7;
+    background-size: 12px 100%;
+    background-repeat: repeat-x;
+}
 
 .lets-start-button {
     display: flex;
