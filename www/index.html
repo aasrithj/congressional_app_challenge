@@ -99,7 +99,7 @@
                         <div class="check-list" id="conditions-list">
                             <!-- Asthma Checkbox -->
                             <label class="check-row check-row-1">
-                                <input type="checkbox" data-value="asthma">
+                                <input type="checkbox" data-value="asthma" checked>
                                 <span class="box"></span>
                                 <span class="check-copy">
                                     <span class="check-heading">Asthma</span>
@@ -134,7 +134,7 @@
                                 </span>
                             </label>
                             <!-- Other Conditions Checkbox -->
-                            <label class="check-row check-row-5">
+                            <label class="check-row check-row-6">
                                 <input type="checkbox" data-value="other">
                                 <span class="box"></span>
                                 <span class="check-copy">
@@ -143,9 +143,10 @@
                                 </span>
                             </label>
                         </div>
+                        <p class="step-1-error-message" id="conditions-error"></p>
                         <!-- Next Button -->
                         <div class="step-1-selection-button">
-                            <button class="step-1-btn-primary" onclick="goTo('screen-setup-location')">Next</button>
+                            <button class="step-1-btn-primary" onclick="saveConditionsAndContinue()">Next</button>
                         </div>
                     </div>
                 </section>
@@ -161,7 +162,7 @@
                                 <h1 class="step-2-heading">Where are you?</h1>
                             </div>
                             <div class="step-2-description-parent">
-                                <p class="step-2-description">Enter your city or ZIP code so we can look up your local air, directing it to the weather service and nowhere else.</p>
+                                <p class="step-2-description">Enter your city or ZIP code so we can look up your local air, directing it to the Open-Meteo API and nowhere else.</p>
                             </div>
                         </div>
                         <!-- **Location Input / Information** -->
@@ -183,11 +184,12 @@
                         </div>
                         <!-- **IMPORTANT** -->
                         <div class="step-2-error-message" id="location-display"></div>
+                        <div class="step-2-required-error" id="location-required-error"></div>
                         <!-- **IMPORTANT** -->
                         <!-- Back and Next Buttons -->
                         <div class="step-2-selection-buttons">
                             <button class="step-btn-back" onclick="goTo('screen-setup-conditions')">Back</button>
-                            <button class="step-btn-next" onclick="goTo('screen-setup-day-timings')">Next</button>
+                            <button class="step-btn-next" onclick="continueFromLocation()">Next</button>
                         </div>
                     </div>
                 </section>
@@ -217,14 +219,16 @@
                                 <input class="step-3-time-input" type="text" id="sleep-time" placeholder="10:00 PM">
                             </div>
                         </div>
+                        <!-- Step 3 Validation Message -->
+                        <div class="step-3-error-message" id="schedule-error"></div>
                         <!-- Back and Next Buttons -->
                         <div class="step-3-selection-buttons">
                             <button class="step-btn-back" onclick="goTo('screen-setup-location')">Back</button>
-                            <button class="step-btn-next" onclick="goTo('screen-setup-materials')">Next</button>
+                            <button class="step-btn-next" onclick="continueFromSchedule()">Next</button>
                         </div>
                     </div>
                 </section>
-                <!-- Section 4 -->
+                <!-- Section 5 -->
                 <section class="screen step-4-section" id="screen-setup-materials">
                     <div class="step-4-selection">
                         <!-- Top Text Content -->
@@ -239,7 +243,38 @@
                                 <p class="step-4-description">We'll remind you on the days it matters — not every day.</p>
                             </div>
                         </div>
-                        <!-- FIND WAYS TO TAKE USER INPUTS ON THE STEP 1 FORM AND TURN THEM INTO TAILORED CHECKBOXES FOR ITEMS ACCORDING TO THEIR MEDICAL CONDITIONS -->
+                        <!-- Condition-Specific Materials -->
+                        <div class="step-4-material-groups" id="materials-groups"></div>
+                        <!-- Common Materials -->
+                        <div class="step-4-common-group">
+                            <p class="step-4-group-heading">COMMON — TAP TO ADD</p>
+                            <div class="step-4-material-list" id="common-materials"></div>
+                        </div>
+                        <!-- Add a Custom Material -->
+                        <div class="step-4-custom-card">
+                            <label class="step-4-group-heading" for="custom-material-name">ADD YOUR OWN</label>
+                            <div class="step-4-custom-row">
+                                <input class="step-4-custom-input" id="custom-material-name" type="text" placeholder="e.g. epinephrine auto-injector" maxlength="60">
+                                <button class="step-4-add-button" type="button" onclick="addCustomMaterial()">Add item</button>
+                            </div>
+                            <label class="step-4-group-heading" for="custom-material-reminder">REMIND ME...</label>
+                            <select class="step-4-reminder-select" id="custom-material-reminder">
+                                <option value="air-quality">when air quality is poor</option>
+                                <option value="pressure">when pressure is shifting</option>
+                                <option value="uv">when UV is high</option>
+                                <option value="dry-air">when the air is dry</option>
+                                <option value="heat">when it is hot out</option>
+                                <option value="always">whenever I go outside</option>
+                            </select>
+                        </div>
+                        <!-- Back and Continue Buttons -->
+                        <div class="step-4-selection-buttons">
+                            <button class="step-btn-back" onclick="goTo('screen-setup-day-timings')">Back</button>
+                            <button class="step-btn-next" onclick="finishSetup()">Continue</button>
+                        </div>
+                        <p class="step-4-status" id="materials-status"></p>
+                        <!-- Required Open Data Attribution -->
+                        <p class="step-4-attribution">Weather: <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a>. Air quality: CAMS via Open-Meteo.</p>
                     </div>
                 </section>
             </div>
