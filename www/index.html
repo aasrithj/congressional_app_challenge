@@ -77,7 +77,17 @@
                     </div>
                     <!-- Let's Start Button -->
                     <div class="lets-start-button">
-                        <button class="btn-primary" onclick="goTo('screen-setup-conditions')">Let&rsquo;s Start</button>
+                        <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                         <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                          <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                           <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                            <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                             <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                              <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                               <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                                <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                                 <!-- REMINDER TO CHANGE BACK TO screen-setup-conditions AGAIN -->
+                        <button class="btn-primary" onclick="startApp()">Let&rsquo;s Start</button>
                     </div>
                 </section>
                 <!-- Section 2 -->
@@ -288,7 +298,7 @@
                         <!-- Top Text Content -->
                         <div class="top-text-content">
                             <div class="step-label-parent">
-                                <div class="step-label">STEP 4 - OPTIONAL</div>
+                                <div class="step-label">STEP 5 - OPTIONAL</div>
                             </div>
                             <div class="step-4-heading-parent">
                                 <h1 class="step-4-heading">Want a heads-up before a good window?</h1>
@@ -329,13 +339,103 @@
                         </div>
                         <div class="step-5-selection-buttons">
                             <button class="step-btn-back" onclick="goTo('screen-setup-materials')">Back</button>
-                            <button class="step-btn-next" onclick="goTo('')">Next</button>
+                            <button class="step-btn-next" onclick="finishSetup()">Finish Setup</button>
                         </div>
                     </div>
                 </section>
-                <!-- Section 7 -->
-                <section class="screen step-6-section" id="step-6-section">
-                    
+                <!-- Section 7 - Home / Today (shown after setup is finished) -->
+                <section class="screen home-section" id="home-section">
+                    <div class="home-content">
+                        <!-- Greeting and Location -->
+                        <div class="home-top">
+                            <p class="home-label" id="home-date">TODAY</p>
+                            <p class="home-location" id="home-location">Loading your location…</p>
+                        </div>
+                        <!-- Shown when there is no weather data yet -->
+                        <div class="home-card home-message" id="home-message" hidden></div>
+                        <div id="home-dashboard">
+                            <!-- Current Risk Index -->
+                            <div class="home-card current-risk-index">
+                                <h2 class="home-risk-title" id="current-risk-index-title">CURRENT RISK INDEX</h2>
+                                <div class="home-score-row" id="score">
+                                    <h1 class="home-score" id="home-score">--</h1>
+                                    <p class="home-score-max">/ 100</p>
+                                    <span class="home-score-spacer"></span>
+                                    <p class="home-band" id="home-band">--</p>
+                                </div>
+                                <!-- 0–100 Scale -->
+                                <div class="home-scale">
+                                    <div class="home-scale-bar">
+                                        <span class="home-scale-good"></span>
+                                        <span class="home-scale-moderate"></span>
+                                        <span class="home-scale-caution"></span>
+                                        <span class="home-scale-avoid"></span>
+                                        <span class="home-scale-marker" id="home-scale-marker"></span>
+                                    </div>
+                                    <div class="home-scale-numbers">
+                                        <span style="left: 0%">0</span>
+                                        <span style="left: 20%">20</span>
+                                        <span style="left: 40%">40</span>
+                                        <span style="left: 65%">65</span>
+                                        <span style="left: 100%">100</span>
+                                    </div>
+                                </div>
+                                <div class="home-legend">
+                                    <p><b>Good</b> 0–19</p>
+                                    <p><b>Moderate</b> 20–39</p>
+                                    <p><b>Caution</b> 40–64</p>
+                                    <p><b>Avoid</b> 65–100</p>
+                                </div>
+                                <p class="home-advice" id="home-advice"></p>
+                            </div>
+                            <!-- Top Contributors -->
+                            <div class="home-card">
+                                <p class="home-label">WHY — TOP CONTRIBUTORS</p>
+                                <div id="home-contributors"></div>
+                            </div>
+                            <!-- Best Window -->
+                            <div class="home-card">
+                                <p class="home-label" id="home-window-label">BEST WINDOW FOR TODAY</p>
+                                <p class="home-window-time" id="home-window-time">--</p>
+                                <p class="home-window-detail" id="home-window-detail"></p>
+                            </div>
+                            <!-- Bring Today (from the Step 4 carry list) -->
+                            <div class="home-card" id="home-carry-card">
+                                <p class="home-label">BRING TODAY</p>
+                                <div class="home-carry-list" id="home-carry-list"></div>
+                            </div>
+                            <!-- Next 48 Hours -->
+                            <div class="home-card">
+                                <p class="home-label">NEXT 48 HOURS — INDEX PER HOUR</p>
+                                <div class="home-day-toggle">
+                                    <button class="home-day-button active" id="home-day-today" type="button" onclick="setHomeDay(0)">Today</button>
+                                    <button class="home-day-button" id="home-day-tomorrow" type="button" onclick="setHomeDay(1)">Tomorrow</button>
+                                </div>
+                                <div class="home-bars" id="home-bars"></div>
+                                <div class="home-bar-labels">
+                                    <span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>11p</span>
+                                </div>
+                                <p class="home-note" id="home-hour-detail">Tap a bar to see that hour's values.</p>
+                            </div>
+                            <!-- Measured Now -->
+                            <div class="home-card">
+                                <p class="home-label">MEASURED NOW — OFFICIAL SCALES, NOT OURS</p>
+                                <div class="home-measure-grid" id="home-measures"></div>
+                                <p class="home-note">These are published measurements on official scales. The risk index above is HealthSync's own estimate built from them.</p>
+                            </div>
+                            <!-- By Condition -->
+                            <div class="home-card">
+                                <p class="home-label">BY CONDITION</p>
+                                <div class="home-condition-list" id="home-conditions"></div>
+                            </div>
+                        </div>
+                        <!-- Refresh and Edit Setup -->
+                        <p class="home-note home-updated" id="home-updated"></p>
+                        <div class="home-actions">
+                            <button class="step-btn-back" type="button" onclick="goTo('screen-setup-conditions')">Edit setup</button>
+                            <button class="step-btn-next" id="home-refresh" type="button" onclick="refreshHome()">Refresh</button>
+                        </div>
+                    </div>
                 </section>
             </div>
         </div>

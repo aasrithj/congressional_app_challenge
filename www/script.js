@@ -1,3 +1,5 @@
+let conditions;
+
 // Functional Hamburger Menu
 
 function goTo(screenId) {
@@ -13,6 +15,10 @@ function goTo(screenId) {
 
     if (screenId === 'screen-setup-materials') {
         renderMaterials();
+    }
+
+    if (screenId === 'home-section'){
+        createHomeSection();
     }
 }
 
@@ -73,7 +79,7 @@ document.querySelectorAll('#conditions-list input[data-value]').forEach((input) 
 // Save Step 1 Conditions for Step 4
 
 function saveConditionsAndContinue() {
-    const conditions = [...document.querySelectorAll('#conditions-list input:checked')]
+    conditions = [...document.querySelectorAll('#conditions-list input:checked')]
         .map((input) => input.dataset.value);
     const message = document.getElementById('conditions-error');
 
@@ -255,7 +261,7 @@ async function loadWeatherForLocation(location) {
         if (!weatherResponse.ok || !airResponse.ok) throw new Error('Open-Meteo could not return data for this location.');
 
         const [weather, airQuality] = await Promise.all([weatherResponse.json(), airResponse.json()]);
-        localStorage.setItem('healthsyncWeather', JSON.stringify({ weather, airQuality, location }));
+        localStorage.setItem('healthsyncWeather', JSON.stringify({ weather, airQuality, location, savedAt: Date.now() }));
         setLocationMessage(`Location set to ${location.label}. Weather and air quality are ready.`);
     } catch (error) {
         setLocationMessage(`${location.label} is saved, but weather data could not load. Check your connection and try again.`, true);
@@ -574,9 +580,439 @@ function addCustomMaterial() {
     renderMaterials();
 }
 
+// Finish Setup (Step 5) → Home
+
 function finishSetup() {
-    saveMaterialIds();
+    if (document.getElementById('section-6-choices')) saveReminders();
     localStorage.setItem('healthsyncSetupComplete', 'true');
-    const status = document.getElementById('materials-status');
-    if (status) status.textContent = 'Your carry list is saved.';
+    goTo('home-section');
+}
+
+// "Let's Start": run setup the first time, then go straight to Today afterwards
+function startApp() {
+    const setupDone = localStorage.getItem('healthsyncSetupComplete') === 'true';
+    goTo(setupDone ? 'home-section' : 'screen-setup-conditions');
+}
+
+// Navbar links. Only "Today" exists so far; the others fall back to it.
+function goToTab(tabId) {
+    const setupDone = localStorage.getItem('healthsyncSetupComplete') === 'true';
+    if (!setupDone) {
+        goTo('screen-setup-conditions');
+        return;
+    }
+    goTo(document.getElementById(tabId) ? tabId : 'home-section');
+}
+
+// ===== Section 7: Home / Today =====
+
+const CONDITION_NAMES = {
+    asthma: 'Asthma',
+    migraine: 'Migraine',
+    eczema: 'Eczema',
+    'heart-related-condition': 'Heart / circulatory',
+    other: 'Other condition',
+    anemia: 'Anemia'
+};
+
+// How much each weather/air factor matters for each condition (0–1)
+const CONDITION_WEIGHTS = {
+    asthma:                    { aqi: 1, pm25: 1, ozone: 1, cold: 0.8, dry: 0.5, humid: 0.4 },
+    migraine:                  { pressure: 1, heat: 0.8, humid: 0.6, uv: 0.5, pm25: 0.4 },
+    eczema:                    { dry: 1, heat: 0.6, cold: 0.6, uv: 0.4, pm25: 0.4 },
+    'heart-related-condition': { pm25: 1, heat: 1, aqi: 0.9, cold: 0.8, ozone: 0.6 },
+    other:                     { pm25: 0.8, heat: 0.8, cold: 0.8, aqi: 0.7 },
+    anemia:                    { heat: 0.7, cold: 0.7 }
+};
+
+const RISK_BANDS = [
+    { max: 19, name: 'Good', color: '#00AD17', advice: 'Conditions look good. A great time to get outside.' },
+    { max: 39, name: 'Moderate', color: '#E8C000', advice: 'Mostly fine. Keep an eye on how you feel.' },
+    { max: 64, name: 'Caution', color: '#FF9000', advice: 'Shorten outdoor activity or move it to a better hour.' },
+    { max: 100, name: 'Avoid', color: '#FF0000', advice: 'Stay inside if you can, or keep time outdoors very short.' }
+];
+
+let homeDay = 0;
+let homeData = null;
+
+const clamp = (value) => Math.max(0, Math.min(100, value));
+const cToF = (celsius) => celsius * 9 / 5 + 32;
+const ozoneToPpb = (microgramsPerM3) => microgramsPerM3 / 1.96; // Open-Meteo gives µg/m³
+
+function getBand(index) {
+    return RISK_BANDS.find((band) => index <= band.max) || RISK_BANDS[RISK_BANDS.length - 1];
+}
+
+// Turn raw readings into 0–100 "how bad is this" scores for each factor
+function factorScores(reading) {
+    const scores = {};
+    if (reading.aqi != null) scores.aqi = clamp(reading.aqi / 150 * 100);
+    if (reading.pm25 != null) scores.pm25 = clamp(reading.pm25 / 55 * 100);
+    if (reading.ozone != null) scores.ozone = clamp((ozoneToPpb(reading.ozone) - 30) / 55 * 100);
+    if (reading.uv != null) scores.uv = clamp(reading.uv / 11 * 100);
+    if (reading.tempF != null) {
+        scores.heat = clamp((reading.tempF - 75) / 25 * 100);
+        scores.cold = clamp((40 - reading.tempF) / 30 * 100);
+    }
+    if (reading.humidity != null) {
+        scores.dry = clamp((40 - reading.humidity) / 25 * 100);
+        scores.humid = clamp((reading.humidity - 70) / 30 * 100);
+    }
+    if (reading.pressureChange != null) scores.pressure = clamp(Math.abs(reading.pressureChange) / 4 * 100);
+    return scores;
+}
+
+// Our index for one condition: mostly the worst factor, plus a bit of the average
+function conditionIndex(condition, reading) {
+    const weights = CONDITION_WEIGHTS[condition] || CONDITION_WEIGHTS.other;
+    const scores = factorScores(reading);
+    const parts = Object.keys(weights)
+        .filter((factor) => scores[factor] != null)
+        .map((factor) => ({ factor, value: weights[factor] * scores[factor] }));
+    if (!parts.length) return { index: 0, parts: [] };
+
+    const worst = Math.max(...parts.map((part) => part.value));
+    const average = parts.reduce((sum, part) => sum + part.value, 0) / parts.length;
+    parts.sort((a, b) => b.value - a.value);
+    return { index: Math.round(clamp(worst * 0.65 + average * 0.35)), parts };
+}
+
+// The overall index is driven by the worst condition, not an average
+function overallIndex(conditions, reading) {
+    let result = { condition: conditions[0], index: 0, parts: [] };
+    conditions.forEach((condition) => {
+        const current = conditionIndex(condition, reading);
+        if (current.index >= result.index) result = { condition, ...current };
+    });
+    return result;
+}
+
+// Build one reading per hour by lining up the weather and air-quality arrays
+function buildHourlyReadings(weather, airQuality) {
+    const wh = weather.hourly || {};
+    const ah = airQuality.hourly || {};
+    const airIndexByTime = {};
+    (ah.time || []).forEach((time, i) => { airIndexByTime[time] = i; });
+
+    return (wh.time || []).map((time, i) => {
+        const a = airIndexByTime[time];
+        const earlier = i >= 3 ? wh.surface_pressure[i - 3] : null;
+        return {
+            time,
+            hour: Number(time.slice(11, 13)),
+            date: time.slice(0, 10),
+            tempF: wh.temperature_2m[i] != null ? cToF(wh.temperature_2m[i]) : null,
+            humidity: wh.relative_humidity_2m[i],
+            uv: wh.uv_index ? wh.uv_index[i] : (a != null ? ah.uv_index[a] : null),
+            pressureChange: earlier != null && wh.surface_pressure[i] != null ? wh.surface_pressure[i] - earlier : null,
+            aqi: a != null ? ah.us_aqi[a] : null,
+            pm25: a != null ? ah.pm2_5[a] : null,
+            ozone: a != null ? ah.ozone[a] : null
+        };
+    });
+}
+
+function buildCurrentReading(weather, airQuality, hourly) {
+    const wc = weather.current || {};
+    const ac = airQuality.current || {};
+    const hourKey = (wc.time || '').slice(0, 13);
+    const nowHour = hourly.find((reading) => reading.time.slice(0, 13) === hourKey) || hourly[0] || {};
+    return {
+        time: wc.time,
+        tempF: wc.temperature_2m != null ? cToF(wc.temperature_2m) : nowHour.tempF,
+        humidity: wc.relative_humidity_2m != null ? wc.relative_humidity_2m : nowHour.humidity,
+        uv: wc.uv_index != null ? wc.uv_index : (ac.uv_index != null ? ac.uv_index : nowHour.uv),
+        pressureChange: nowHour.pressureChange,
+        aqi: ac.us_aqi != null ? ac.us_aqi : nowHour.aqi,
+        pm25: ac.pm2_5 != null ? ac.pm2_5 : nowHour.pm25,
+        ozone: ac.ozone != null ? ac.ozone : nowHour.ozone
+    };
+}
+
+// "7:00 AM" / "7am" / "19:30" → hour number (0–23)
+function parseHour(text, fallback) {
+    const match = String(text || '').trim().toLowerCase().match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm|a|p)?/);
+    if (!match) return fallback;
+    let hour = Number(match[1]) % 24;
+    const meridiem = match[3];
+    if (meridiem && meridiem.startsWith('p') && hour < 12) hour += 12;
+    if (meridiem && meridiem.startsWith('a') && hour === 12) hour = 0;
+    return hour;
+}
+
+function formatHour(hour) {
+    const h = ((hour % 24) + 24) % 24;
+    const suffix = h < 12 ? 'AM' : 'PM';
+    return `${h % 12 === 0 ? 12 : h % 12} ${suffix}`;
+}
+
+// Lowest-risk stretch of awake hours (starting from now for today)
+function findBestWindow(hours, wakeHour, sleepHour, fromHour) {
+    const awake = hours.filter((h) => {
+        const isAwake = wakeHour <= sleepHour ? h.hour >= wakeHour && h.hour < sleepHour : h.hour >= wakeHour || h.hour < sleepHour;
+        return isAwake && h.hour >= fromHour;
+    });
+    if (!awake.length) return null;
+
+    const best = awake.reduce((low, h) => (h.index < low.index ? h : low), awake[0]);
+    let start = best.hour;
+    let end = best.hour + 1;
+    const byHour = {};
+    awake.forEach((h) => { byHour[h.hour] = h; });
+    while (byHour[start - 1] && byHour[start - 1].index <= best.index + 5 && end - start < 3) start -= 1;
+    while (byHour[end] && byHour[end].index <= best.index + 5 && end - start < 3) end += 1;
+    const worstInside = Math.max(...awake.filter((h) => h.hour >= start && h.hour < end).map((h) => h.index));
+    return { start, end, index: worstInside };
+}
+
+function aqiCategory(aqi) {
+    if (aqi <= 50) return 'Good';
+    if (aqi <= 100) return 'Moderate';
+    if (aqi <= 150) return 'Unhealthy for sensitive groups';
+    if (aqi <= 200) return 'Unhealthy';
+    if (aqi <= 300) return 'Very unhealthy';
+    return 'Hazardous';
+}
+
+function uvCategory(uv) {
+    if (uv < 3) return 'Low';
+    if (uv < 6) return 'Moderate';
+    if (uv < 8) return 'High';
+    if (uv < 11) return 'Very high';
+    return 'Extreme';
+}
+
+// Plain-language explanation of each factor, with the official source
+function describeFactor(factor, reading) {
+    const r = (value, digits = 0) => Number(value).toFixed(digits);
+    switch (factor) {
+        case 'aqi': return { title: `US AQI ${r(reading.aqi)}`, detail: `${aqiCategory(reading.aqi)} (0–50 is Good)`, source: 'AirNow: AQI basics', url: 'https://www.airnow.gov/aqi/aqi-basics/' };
+        case 'pm25': return { title: `PM2.5 ${r(reading.pm25, 1)} µg/m³`, detail: `${reading.pm25 > 9 ? 'above' : 'below'} the 9 µg/m³ annual standard`, source: 'EPA particulate matter standards', url: 'https://www.epa.gov/pm-pollution/national-ambient-air-quality-standards-naaqs-pm' };
+        case 'ozone': { const ppb = ozoneToPpb(reading.ozone); return { title: `Ozone ${r(ppb)} ppb`, detail: `${ppb > 54 ? 'above' : 'below'} the 54 ppb "Good" AQI level`, source: 'EPA ozone and your health', url: 'https://www.airnow.gov/aqi/aqi-basics/' }; }
+        case 'uv': return { title: `UV index ${r(reading.uv, 1)}`, detail: `${uvCategory(reading.uv)}; sun protection advised at 3+`, source: 'EPA UV index scale', url: 'https://www.epa.gov/sunsafety/uv-index-scale-0' };
+        case 'heat': return { title: `Temperature ${r(reading.tempF)}°F`, detail: 'Heat strains the heart and can trigger symptoms', source: 'NWS heat safety', url: 'https://www.weather.gov/safety/heat' };
+        case 'cold': return { title: `Temperature ${r(reading.tempF)}°F`, detail: 'Cold air can tighten airways and blood vessels', source: 'NWS cold safety', url: 'https://www.weather.gov/safety/cold' };
+        case 'dry': return { title: `Humidity ${r(reading.humidity)}%`, detail: 'Dry air (under 40%) dries out skin and airways', source: 'Open-Meteo forecast', url: 'https://open-meteo.com/' };
+        case 'humid': return { title: `Humidity ${r(reading.humidity)}%`, detail: 'Very humid air (over 70%) can make breathing harder', source: 'Open-Meteo forecast', url: 'https://open-meteo.com/' };
+        case 'pressure': return { title: `Pressure ${reading.pressureChange >= 0 ? '+' : ''}${r(reading.pressureChange, 1)} hPa in 3 hrs`, detail: 'Fast pressure changes are a common migraine trigger', source: 'Open-Meteo forecast', url: 'https://open-meteo.com/' };
+        default: return { title: factor, detail: '', source: '', url: '' };
+    }
+}
+
+// Which Step 4 carry items are relevant today
+function itemsToBringToday(hoursLeftToday) {
+    const saved = readSavedValue('healthsyncMaterials', []);
+    if (!saved.length) return [];
+
+    const allItems = [
+        ...Object.values(CONDITION_MATERIALS).flatMap((group) => group.items),
+        ...COMMON_MATERIALS,
+        ...readSavedValue('healthsyncCustomMaterials', [])
+    ];
+    const max = (key) => Math.max(0, ...hoursLeftToday.map((h) => h[key] || 0));
+    const maxPressureSwing = Math.max(0, ...hoursLeftToday.map((h) => Math.abs(h.pressureChange || 0)));
+    const minHumidity = Math.min(100, ...hoursLeftToday.map((h) => (h.humidity == null ? 100 : h.humidity)));
+    const active = {
+        always: true,
+        'air-quality': max('aqi') > 100 || max('pm25') > 35,
+        pressure: maxPressureSwing >= 3,
+        uv: max('uv') >= 3,
+        'dry-air': minHumidity < 35,
+        heat: max('tempF') >= 85
+    };
+
+    const seen = new Set();
+    return saved
+        .map((id) => allItems.find((item) => item.id === id))
+        .filter((item) => item && active[item.trigger] && !seen.has(item.name.toLowerCase()) && seen.add(item.name.toLowerCase()));
+}
+
+function renderHourBars() {
+    if (!homeData) return;
+    const bars = document.getElementById('home-bars');
+    const day = homeData.days[homeDay] || [];
+    document.getElementById('home-day-today').classList.toggle('active', homeDay === 0);
+    document.getElementById('home-day-tomorrow').classList.toggle('active', homeDay === 1);
+
+    bars.innerHTML = day.map((h, i) => `
+        <button class="home-bar${homeDay === 0 && h.hour === homeData.nowHour ? ' now' : ''}" type="button" data-i="${i}"
+            style="height:${Math.max(6, h.index)}%; background:${getBand(h.index).color}"
+            aria-label="${formatHour(h.hour)}: index ${h.index}"></button>`).join('');
+
+    bars.querySelectorAll('.home-bar').forEach((bar) => {
+        bar.addEventListener('click', () => {
+            const h = day[Number(bar.dataset.i)];
+            bars.querySelectorAll('.home-bar').forEach((b) => b.classList.remove('selected'));
+            bar.classList.add('selected');
+            const bits = [];
+            if (h.aqi != null) bits.push(`AQI ${Math.round(h.aqi)}`);
+            if (h.pm25 != null) bits.push(`PM2.5 ${h.pm25.toFixed(1)}`);
+            if (h.uv != null) bits.push(`UV ${h.uv.toFixed(1)}`);
+            if (h.tempF != null) bits.push(`${Math.round(h.tempF)}°F`);
+            if (h.humidity != null) bits.push(`${Math.round(h.humidity)}% humidity`);
+            document.getElementById('home-hour-detail').textContent =
+                `${formatHour(h.hour)}: index ${h.index} (${getBand(h.index).name}) · ${bits.join(' · ')}`;
+        });
+    });
+}
+
+function setHomeDay(day) {
+    homeDay = day;
+    document.getElementById('home-hour-detail').textContent = "Tap a bar to see that hour's values.";
+    renderHourBars();
+}
+
+function showHomeMessage(text) {
+    const message = document.getElementById('home-message');
+    message.textContent = text;
+    message.hidden = !text;
+    document.getElementById('home-dashboard').hidden = Boolean(text);
+}
+
+async function refreshHome() {
+    const location = readSavedValue('healthsyncLocation');
+    const button = document.getElementById('home-refresh');
+    if (!location) {
+        showHomeMessage('Add your location in setup so we can load local weather and air quality.');
+        return;
+    }
+    button.disabled = true;
+    button.textContent = 'Refreshing…';
+    await loadWeatherForLocation(location);
+    button.disabled = false;
+    button.textContent = 'Refresh';
+    createHomeSection(true);
+}
+
+function createHomeSection(skipAutoRefresh = false) {
+    const conditions = readSavedValue('healthsyncConditions', []);
+    const saved = readSavedValue('healthsyncWeather');
+    const schedule = readSavedValue('healthsyncSchedule', {});
+
+    document.getElementById('home-date').textContent = new Date()
+        .toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+
+    if (!conditions.length) {
+        showHomeMessage('Pick at least one condition in setup to see your risk index.');
+        return;
+    }
+    if (!saved || !saved.weather || !saved.airQuality) {
+        document.getElementById('home-location').textContent = '';
+        showHomeMessage('Loading weather and air quality…');
+        if (!skipAutoRefresh) refreshHome();
+        else showHomeMessage('Weather data could not load. Check your connection and tap Refresh.');
+        return;
+    }
+
+    // Data older than an hour gets refreshed automatically
+    const ageMinutes = (Date.now() - (saved.savedAt || 0)) / 60000;
+    if (!skipAutoRefresh && saved.savedAt && ageMinutes > 60) {
+        refreshHome();
+        return;
+    }
+
+    showHomeMessage('');
+    const { weather, airQuality, location } = saved;
+    document.getElementById('home-location').textContent = location && location.label ? location.label : '';
+
+    // Current index
+    const hourly = buildHourlyReadings(weather, airQuality);
+    const now = buildCurrentReading(weather, airQuality, hourly);
+    const current = overallIndex(conditions, now);
+    const band = getBand(current.index);
+    const worstName = CONDITION_NAMES[current.condition] || current.condition;
+
+    document.getElementById('current-risk-index-title').innerHTML =
+        `CURRENT RISK INDEX FOR <span class="home-highlight">${escapeHtml(worstName.toUpperCase())}</span>`;
+    document.getElementById('home-score').textContent = current.index;
+    const bandLabel = document.getElementById('home-band');
+    bandLabel.textContent = band.name.toUpperCase();
+    bandLabel.style.color = band.color === '#E8C000' ? '#9A7F00' : band.color;
+    document.getElementById('home-scale-marker').style.left = `${current.index}%`;
+    document.getElementById('home-advice').textContent = conditions.length > 1
+        ? `${band.advice} Driven by ${worstName.toLowerCase()}, your highest-risk condition right now, not an average.`
+        : band.advice;
+
+    // Top contributors (the 2 biggest factors for the worst condition)
+    const top = current.parts.filter((part) => part.value > 0).slice(0, 2);
+    document.getElementById('home-contributors').innerHTML = top.length
+        ? top.map((part) => {
+            const info = describeFactor(part.factor, now);
+            return `
+                <div class="home-contributor">
+                    <p class="home-contributor-title">${escapeHtml(info.title)}</p>
+                    <p class="home-contributor-detail">${escapeHtml(info.detail)}</p>
+                    <a class="home-source" href="${info.url}" target="_blank" rel="noopener">${escapeHtml(info.source)} ↗</a>
+                </div>`;
+        }).join('')
+        : '<p class="home-contributor-detail">Nothing is raising your risk right now.</p>';
+
+    // Hourly index, split into today and tomorrow
+    hourly.forEach((h) => { h.index = overallIndex(conditions, h).index; });
+    const dates = [...new Set(hourly.map((h) => h.date))];
+    const nowHour = Number(String(now.time || '').slice(11, 13)) || new Date().getHours();
+    homeData = { days: [hourly.filter((h) => h.date === dates[0]), hourly.filter((h) => h.date === dates[1])], nowHour };
+    renderHourBars();
+
+    // Best window (today if there are awake hours left, otherwise tomorrow)
+    const wakeHour = parseHour(schedule.wake, 7);
+    const sleepHour = parseHour(schedule.sleep, 22);
+    let windowDay = 'TODAY';
+    let best = findBestWindow(homeData.days[0], wakeHour, sleepHour, nowHour);
+    if (!best && homeData.days[1].length) {
+        best = findBestWindow(homeData.days[1], wakeHour, sleepHour, 0);
+        windowDay = 'TOMORROW';
+    }
+    document.getElementById('home-window-label').textContent = `BEST WINDOW FOR ${windowDay}`;
+    if (best) {
+        const bestBand = getBand(best.index);
+        document.getElementById('home-window-time').textContent = `${formatHour(best.start)} – ${formatHour(best.end)}`;
+        document.getElementById('home-window-detail').textContent = `Index ${best.index} / 100 · ${bestBand.name}`;
+    } else {
+        document.getElementById('home-window-time').textContent = 'No window found';
+        document.getElementById('home-window-detail').textContent = 'Check your wake and sleep times in setup.';
+    }
+
+    // Bring today
+    const hoursLeft = homeData.days[0].filter((h) => h.hour >= nowHour);
+    const bring = itemsToBringToday(hoursLeft.length ? hoursLeft : homeData.days[0]);
+    document.getElementById('home-carry-list').innerHTML = bring.length
+        ? bring.map((item) => `
+            <div class="home-carry-item">
+                <span class="home-carry-dot"></span>
+                <span><b>${escapeHtml(item.name)}</b><br><span class="home-contributor-detail">${escapeHtml(item.reminder)}</span></span>
+            </div>`).join('')
+        : '<p class="home-contributor-detail">Nothing extra needed today based on your carry list.</p>';
+
+    // Measured now
+    const measures = [
+        { label: 'US AQI', value: now.aqi != null ? Math.round(now.aqi) : '--', note: now.aqi != null ? `${aqiCategory(now.aqi)} · 0–500` : '' },
+        { label: 'PM2.5', value: now.pm25 != null ? now.pm25.toFixed(1) : '--', note: 'µg/m³' },
+        { label: 'OZONE', value: now.ozone != null ? Math.round(ozoneToPpb(now.ozone)) : '--', note: 'ppb' },
+        { label: 'UV INDEX', value: now.uv != null ? now.uv.toFixed(1) : '--', note: now.uv != null ? `${uvCategory(now.uv)} · 0–11+` : '' },
+        { label: 'TEMP', value: now.tempF != null ? `${Math.round(now.tempF)}°` : '--', note: 'Fahrenheit' },
+        { label: 'HUMIDITY', value: now.humidity != null ? `${Math.round(now.humidity)}%` : '--', note: 'relative' }
+    ];
+    document.getElementById('home-measures').innerHTML = measures.map((m) => `
+        <div class="home-measure">
+            <p class="home-measure-label">${m.label}</p>
+            <p class="home-measure-value">${m.value}</p>
+            <p class="home-measure-note">${m.note}</p>
+        </div>`).join('');
+
+    // By condition
+    document.getElementById('home-conditions').innerHTML = conditions.map((condition) => {
+        const result = conditionIndex(condition, now);
+        const conditionBand = getBand(result.index);
+        return `
+            <div class="home-condition-row">
+                <span class="home-condition-name">${escapeHtml(CONDITION_NAMES[condition] || condition)}</span>
+                <span class="home-condition-score"><span class="home-condition-dot" style="background:${conditionBand.color}"></span>${result.index} / 100 · ${conditionBand.name}</span>
+            </div>`;
+    }).join('');
+
+    const updated = saved.savedAt ? new Date(saved.savedAt) : null;
+    document.getElementById('home-updated').textContent = updated
+        ? `Updated ${updated.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}. Data changes constantly, so tap Refresh for the latest.`
+        : 'Data changes constantly, so tap Refresh for the latest.';
 }
