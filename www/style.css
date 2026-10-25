@@ -806,10 +806,11 @@ button {
     flex-direction: column;
     gap: 0.35rem;
     padding: 1rem;
-    border: 1px solid #d0d0d0;
+    border: 1.9px solid #BBBBBB;
     background: #ffffff;
     width: 95%;
     margin-top: 1.2rem;
+    margin-bottom: 3rem;
 }
 
 .step-4-custom-input,
@@ -896,7 +897,7 @@ button {
 .step-4-selection-buttons {
     position: sticky;
     bottom: 0;
-    z-index: 2;
+    z-index: 10;
     display: flex;
     gap: 0.5rem;
     width: 100%;
@@ -1055,4 +1056,25 @@ button {
     margin-top: 3.8rem;
     padding: 2rem 0;
     background: #f0f0f0;
+}
+
+.step-4-error-message:empty {
+    display: none;
+}
+
+.step-4-error-message:not(:empty) {
+    position: relative;
+    left: -1rem;
+    bottom: 1.5rem;
+    z-index: 5;
+    padding: 0.55rem 0.7rem;
+    border-left: 4px solid #bd3c3c;
+    border-radius: 0.5rem;
+    background: #fff0f0;
+    color: #9b2424;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.3rem;
+    margin-left: 1rem;
+    width: 95%;
 }

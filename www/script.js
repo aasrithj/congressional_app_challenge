@@ -1,5 +1,3 @@
-// Functional Hamburger Menu
-
 function goTo(screenId) {
     const target = document.getElementById(screenId);
     if (!target) return;
@@ -34,8 +32,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Close the Hamburger Menu when Clicking Outside of Its Viewport
-
 document.addEventListener('click', (event) => {
     const menu = document.getElementById('nav-links');
     const button = document.getElementById('hamburger-button');
@@ -45,8 +41,6 @@ document.addEventListener('click', (event) => {
     }
 });
 
-// Close the Hamburger Menu Automatically when Clicking on a Section
-
 document.getElementById('nav-links').addEventListener('click', (event) => {
     const link = event.target.closest('a');
 
@@ -55,11 +49,8 @@ document.getElementById('nav-links').addEventListener('click', (event) => {
     }
 });
 
-// Restore Previously Selected Conditions
-
 const conditionDefaultsVersion = localStorage.getItem('healthsyncConditionDefaultsVersion');
 
-// Reset the previous starter selections once; later user choices are preserved.
 if (conditionDefaultsVersion !== 'asthma-only-v2') {
     localStorage.setItem('healthsyncConditions', JSON.stringify(['asthma']));
     localStorage.setItem('healthsyncConditionDefaultsVersion', 'asthma-only-v2');
@@ -70,7 +61,10 @@ document.querySelectorAll('#conditions-list input[data-value]').forEach((input) 
     input.checked = savedConditions.includes(input.dataset.value);
 });
 
-// Save Step 1 Conditions for Step 4
+document.getElementById('conditions-list').addEventListener('change', () => {
+    const message = document.getElementById('conditions-error');
+    if (message) message.textContent = '';
+});
 
 function saveConditionsAndContinue() {
     const conditions = [...document.querySelectorAll('#conditions-list input:checked')]
@@ -87,15 +81,11 @@ function saveConditionsAndContinue() {
     goTo('screen-setup-location');
 }
 
-// Restore Previously Selected Reminders (Step 4 - Optional)
-
 const savedReminders = readSavedValue('healthsyncReminders', ['morning-summary']);
 document.querySelectorAll('#section-6-choices input[data-value]').forEach((input) => {
     input.checked = savedReminders.includes(input.dataset.value);
     input.addEventListener('change', saveReminders);
 });
-
-// Save Step 4 Optional Reminders
 
 function saveReminders() {
     const reminders = [...document.querySelectorAll('#section-6-choices input:checked')]
@@ -103,8 +93,6 @@ function saveReminders() {
 
     localStorage.setItem('healthsyncReminders', JSON.stringify(reminders));
 }
-
-// Location Permission Request and Open-Meteo Weather Lookup for Step 2
 
 let locationChoice = null;
 let locationConfirmedThisRun = false;
@@ -268,8 +256,6 @@ async function continueFromLocation() {
     if (query && !locationChoice) locationChoice = 'manual';
     clearLocationRequiredError();
 
-    // If GPS is still resolving, wait for its callback instead of showing
-    // the missing-location error. A successful callback continues the flow.
     if (locationChoice === 'gps' && gpsRequestPending) {
         continueAfterGps = true;
         return;
@@ -303,8 +289,6 @@ async function continueFromLocation() {
     setLocationMessage('', false);
     setLocationRequiredError('Choose or enter a location to continue.');
 }
-
-// Validate Step 3 Wake and Sleep Times
 
 function continueFromSchedule() {
     const wakeInput = document.getElementById('wake-time');
@@ -344,8 +328,6 @@ document.getElementById('manual-city').addEventListener('input', () => {
     clearLocationRequiredError();
     setLocationMessage('This city or ZIP code will be used for your weather data.');
 });
-
-// Step 4 Carry Items by Selected Condition
 
 const CONDITION_MATERIALS = {
     asthma: {
@@ -424,6 +406,7 @@ function initializeRecommendedMaterials(selectedConditions) {
 }
 
 function saveMaterialIds() {
+    setMaterialsError('');
     const selected = [...document.querySelectorAll('[data-material-id]:checked')]
         .map((input) => input.dataset.materialId);
     localStorage.setItem('healthsyncMaterials', JSON.stringify(selected));
@@ -469,6 +452,7 @@ function renderMaterials() {
     const selectedConditions = readSavedValue('healthsyncConditions', []);
     initializeRecommendedMaterials(selectedConditions);
     const selectedIds = getSavedMaterialIds();
+    setMaterialsError('');
     const customItems = readSavedValue('healthsyncCustomMaterials', []);
     const groups = document.getElementById('materials-groups');
     const common = document.getElementById('common-materials');
@@ -579,4 +563,21 @@ function finishSetup() {
     localStorage.setItem('healthsyncSetupComplete', 'true');
     const status = document.getElementById('materials-status');
     if (status) status.textContent = 'Your carry list is saved.';
+}
+
+function setMaterialsError(message) {
+    const error = document.getElementById('materials-error');
+    if (error) error.textContent = message;
+}
+
+function continueFromMaterials() {
+    const selected = document.querySelectorAll('#screen-setup-materials [data-material-id]:checked');
+
+    if (!selected.length) {
+        setMaterialsError('Please select one or more items to continue.');
+        return;
+    }
+
+    setMaterialsError('');
+    goTo('screen-risk-index');
 }

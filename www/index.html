@@ -211,11 +211,11 @@
                         <div class="step-3-form-inputs">
                             <div class="step-3-form-row">
                                 <label class="step-3-field-label" for="wake-time">USUALLY UP AT</label>
-                                <input class="step-3-time-input" type="text" id="wake-time" placeholder="7:00 AM">
+                                <input class="step-3-time-input" type="text" id="wake-time" placeholder="e.g. 7:00 AM">
                             </div>
                             <div class="step-3-form-row">
                                 <label class="step-3-field-label" for="sleep-time">USUALLY ASLEEP BY</label>
-                                <input class="step-3-time-input" type="text" id="sleep-time" placeholder="10:00 PM">
+                                <input class="step-3-time-input" type="text" id="sleep-time" placeholder="e.g. 10:00 PM">
                             </div>
                         </div>
                         <!-- Step 3 Validation Message -->
@@ -275,20 +275,22 @@
                                 <option value="always">whenever I go outside</option>
                             </select>
                         </div>
+                        <!-- Step 4 Validation/Error Message -->
+                        <p class="step-4-error-message" id="materials-error"></p>
                         <!-- Back and Next Buttons -->
                         <div class="step-4-selection-buttons">
                             <button class="step-btn-back" onclick="goTo('screen-setup-day-timings')">Back</button>
-                            <button class="step-btn-next" onclick="goTo('step-5-section')">Next</button>
+                            <button class="step-btn-next" onclick="continueFromMaterials()">Next</button>
                         </div>
                     </div>
                 </section>
                 <!-- Section 6 - Optional -->
-                <section class="screen step-5-section" id="step-5-section">
+                <section class="screen step-5-section" id="screen-risk-index">
                     <div class="step-5-selection">
                         <!-- Top Text Content -->
                         <div class="top-text-content">
                             <div class="step-label-parent">
-                                <div class="step-label">STEP 4 - OPTIONAL</div>
+                                <div class="step-label">STEP 5 - OPTIONAL</div>
                             </div>
                             <div class="step-4-heading-parent">
                                 <h1 class="step-4-heading">Want a heads-up before a good window?</h1>
@@ -305,7 +307,7 @@
                                 <span class="box"></span>
                                 <span class="check-copy">
                                     <span class="check-heading">Morning summary</span>
-                                    <span class="check-subheading">One notification at 7 AM with today's best window.</span>
+                                    <span class="check-subheading">One notification at 7:00 AM with today's best window.</span>
                                 </span>
                             </label>
                             <!-- Before a Good Window Checkbox -->
@@ -323,7 +325,7 @@
                                 <span class="box"></span>
                                 <span class="check-copy">
                                     <span class="check-heading">When conditions turn bad</span>
-                                    <span class="check-subheading">Only when the index crosses into Avoid.</span>
+                                    <span class="check-subheading">Only when the index crosses into "Avoid."</span>
                                 </span>
                             </label>
                         </div>
@@ -335,7 +337,7 @@
                 </section>
                 <!-- Section 7 -->
                 <section class="screen step-6-section" id="step-6-section">
-                    
+
                 </section>
             </div>
         </div>
