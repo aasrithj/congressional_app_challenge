@@ -278,9 +278,64 @@
                         <!-- Back and Next Buttons -->
                         <div class="step-4-selection-buttons">
                             <button class="step-btn-back" onclick="goTo('screen-setup-day-timings')">Back</button>
-                            <button class="step-btn-next" onclick="finishSetup()">Next</button>
+                            <button class="step-btn-next" onclick="goTo('step-5-section')">Next</button>
                         </div>
                     </div>
+                </section>
+                <!-- Section 6 - Optional -->
+                <section class="screen step-5-section" id="step-5-section">
+                    <div class="step-5-selection">
+                        <!-- Top Text Content -->
+                        <div class="top-text-content">
+                            <div class="step-label-parent">
+                                <div class="step-label">STEP 4 - OPTIONAL</div>
+                            </div>
+                            <div class="step-4-heading-parent">
+                                <h1 class="step-4-heading">Want a heads-up before a good window?</h1>
+                            </div>
+                            <div class="step-4-description-parent">
+                                <p class="step-4-description">We can tell you when conditions are about to be good, or about to get bad.</p>
+                            </div>
+                        </div>
+                        <!-- Reminder Checkboxes -->
+                        <div class="choices" id="section-6-choices">
+                            <!-- Morning Summary Checkbox -->
+                            <label class="check-row check-row-1">
+                                <input type="checkbox" data-value="morning-summary" checked>
+                                <span class="box"></span>
+                                <span class="check-copy">
+                                    <span class="check-heading">Morning summary</span>
+                                    <span class="check-subheading">One notification at 7 AM with today's best window.</span>
+                                </span>
+                            </label>
+                            <!-- Before a Good Window Checkbox -->
+                            <label class="check-row check-row-2">
+                                <input type="checkbox" data-value="before-good-window">
+                                <span class="box"></span>
+                                <span class="check-copy">
+                                    <span class="check-heading">Before a good window</span>
+                                    <span class="check-subheading">30 minutes ahead of the best window we found.</span>
+                                </span>
+                            </label>
+                            <!-- When Conditions Turn Bad Checkbox -->
+                            <label class="check-row check-row-3">
+                                <input type="checkbox" data-value="conditions-turn-bad">
+                                <span class="box"></span>
+                                <span class="check-copy">
+                                    <span class="check-heading">When conditions turn bad</span>
+                                    <span class="check-subheading">Only when the index crosses into Avoid.</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="step-5-selection-buttons">
+                            <button class="step-btn-back" onclick="goTo('screen-setup-materials')">Back</button>
+                            <button class="step-btn-next" onclick="goTo('')">Next</button>
+                        </div>
+                    </div>
+                </section>
+                <!-- Section 7 -->
+                <section class="screen step-6-section" id="step-6-section">
+                    
                 </section>
             </div>
         </div>

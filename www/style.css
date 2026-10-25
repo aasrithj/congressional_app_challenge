@@ -340,7 +340,8 @@ button {
     font-weight: 450;
 }
 
-.check-list {
+.check-list,
+.choices {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
@@ -1035,4 +1036,23 @@ button {
 
 .step-4-attribution a {
     color: inherit;
+}
+
+.step-5-selection {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: flex-start;
+    margin-top: 1.5rem;
+    margin-left: 1rem;
+    width: 95%;
+}
+
+.step-5-selection-buttons {
+    display: flex;
+    gap: 0.5rem;
+    width: 98%;
+    margin-top: 3.8rem;
+    padding: 2rem 0;
+    background: #f0f0f0;
 }

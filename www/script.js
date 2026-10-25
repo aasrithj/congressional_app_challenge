@@ -87,6 +87,23 @@ function saveConditionsAndContinue() {
     goTo('screen-setup-location');
 }
 
+// Restore Previously Selected Reminders (Step 4 - Optional)
+
+const savedReminders = readSavedValue('healthsyncReminders', ['morning-summary']);
+document.querySelectorAll('#section-6-choices input[data-value]').forEach((input) => {
+    input.checked = savedReminders.includes(input.dataset.value);
+    input.addEventListener('change', saveReminders);
+});
+
+// Save Step 4 Optional Reminders
+
+function saveReminders() {
+    const reminders = [...document.querySelectorAll('#section-6-choices input:checked')]
+        .map((input) => input.dataset.value);
+
+    localStorage.setItem('healthsyncReminders', JSON.stringify(reminders));
+}
+
 // Location Permission Request and Open-Meteo Weather Lookup for Step 2
 
 let locationChoice = null;
