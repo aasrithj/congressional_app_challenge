@@ -185,7 +185,6 @@
                         <!-- **IMPORTANT** -->
                         <div class="step-2-error-message" id="location-display"></div>
                         <div class="step-2-required-error" id="location-required-error"></div>
-                        <!-- **IMPORTANT** -->
                         <!-- Back and Next Buttons -->
                         <div class="step-2-selection-buttons">
                             <button class="step-btn-back" onclick="goTo('screen-setup-conditions')">Back</button>
@@ -243,19 +242,28 @@
                                 <p class="step-4-description">We'll remind you on the days it matters — not every day.</p>
                             </div>
                         </div>
-                        <!-- Condition-Specific Materials -->
+                        <!-- Materials (specific code in JavaScript file) -->
                         <div class="step-4-material-groups" id="materials-groups"></div>
-                        <!-- Common Materials -->
+                        <!-- Common Materials Row -->
                         <div class="step-4-common-group">
-                            <p class="step-4-group-heading">COMMON — TAP TO ADD</p>
+                            <div class="step-4-group-heading-child">
+                                <p class="step-4-group-heading">COMMON — TAP TO ADD</p>
+                            </div>
                             <div class="step-4-material-list" id="common-materials"></div>
                         </div>
-                        <!-- Add a Custom Material -->
+                        <!-- Custom Material Option -->
                         <div class="step-4-custom-card">
                             <label class="step-4-group-heading" for="custom-material-name">ADD YOUR OWN</label>
                             <div class="step-4-custom-row">
                                 <input class="step-4-custom-input" id="custom-material-name" type="text" placeholder="e.g. epinephrine auto-injector" maxlength="60">
-                                <button class="step-4-add-button" type="button" onclick="addCustomMaterial()">Add item</button>
+                                <div class="step-4-custom-actions">
+                                    <button class="step-4-add-button" type="button" onclick="addCustomMaterial()">Add item</button>
+                                    <button class="step-4-remove-button" id="remove-custom-items-button" type="button" onclick="toggleCustomMaterialRemoval()">Remove item</button>
+                                    <button class="step-4-save-changes-button" id="save-custom-removals-button" type="button" onclick="saveCustomMaterialRemovals()" hidden>Save changes</button>
+                                </div>
+                                <div class="step-4-status-parent">
+                                    <p class="step-4-status" id="materials-status"></p>
+                                </div>
                             </div>
                             <label class="step-4-group-heading" for="custom-material-reminder">REMIND ME...</label>
                             <select class="step-4-reminder-select" id="custom-material-reminder">
@@ -267,14 +275,11 @@
                                 <option value="always">whenever I go outside</option>
                             </select>
                         </div>
-                        <!-- Back and Continue Buttons -->
+                        <!-- Back and Next Buttons -->
                         <div class="step-4-selection-buttons">
                             <button class="step-btn-back" onclick="goTo('screen-setup-day-timings')">Back</button>
-                            <button class="step-btn-next" onclick="finishSetup()">Continue</button>
+                            <button class="step-btn-next" onclick="finishSetup()">Next</button>
                         </div>
-                        <p class="step-4-status" id="materials-status"></p>
-                        <!-- Required Open Data Attribution -->
-                        <p class="step-4-attribution">Weather: <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a>. Air quality: CAMS via Open-Meteo.</p>
                     </div>
                 </section>
             </div>

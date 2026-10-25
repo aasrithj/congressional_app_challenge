@@ -43,7 +43,6 @@ button {
     flex-direction: column;
 }
 
-/* Let the setup screens scroll inside the fixed-height app frame. */
 .scroll-area-app {
     flex: 1 1 auto;
     min-height: 0;
@@ -456,7 +455,7 @@ button {
     font-weight: 750;
     font-size: 1.05rem;
     border-radius: 1.5rem;
-    width: 88%;
+    width: 90%;
     margin-left: 0.5rem;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -508,8 +507,6 @@ button {
     color: #666666;
     font-weight: 450;
 }
-
-/* FIX WIDTH */
 
 .step-2-form-container {
     display: flex;
@@ -683,7 +680,6 @@ button {
 }
 
 .step-4-selection {
-    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -691,11 +687,6 @@ button {
     margin-top: 1.5rem;
     margin-left: 1rem;
     width: 95%;
-    margin: 0 auto;
-    padding: 1rem 0.75rem 1rem;
-    width: 100%;
-    gap: 0.55rem;
-    text-align: left;
 }
 
 .step-4-heading-parent {
@@ -718,10 +709,8 @@ button {
     font-weight: 450;
 }
 
-
-
 .step-4-selection .top-text-content {
-    margin-bottom: 0.2rem;
+    margin-bottom: 1rem;
 }
 
 .step-4-selection .step-label-parent,
@@ -731,13 +720,15 @@ button {
 }
 
 .step-4-selection .step-4-heading {
-    font-size: 1.35rem;
+    font-size: 1.5rem;
     font-weight: 700;
 }
 
 .step-4-selection .step-4-description {
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     line-height: 1.25rem;
+    font-weight: 450;
+    margin-top: 1.5rem;
 }
 
 .step-4-material-groups,
@@ -755,7 +746,7 @@ button {
 }
 
 .step-4-condition-group {
-    margin-bottom: 0.3rem;
+    margin-bottom: 1rem;
 }
 
 .step-4-group-heading {
@@ -768,26 +759,24 @@ button {
 }
 
 .step-4-material-list {
-    gap: 0.35rem;
+    gap: 0.55rem;
 }
 
 .step-4-material-row {
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    min-height: 3.1rem;
-    padding: 0.42rem 0.55rem;
-    border: 1px solid #d0d0d0;
-    background: #ffffff;
+    padding: 0.8rem 1rem;
+    border-radius: 0.8rem;
+    border: 1.9px solid #BBBBBB;
+    width: 95%;
+    corner-shape: squircle;
+    background-color: #FFFFFF;
+    user-select: none;
+    transition: all 0.25s ease;
     cursor: pointer;
 }
 
-.step-4-material-row input {
-    accent-color: #1f1f1f;
-    width: 0.95rem;
-    height: 0.95rem;
-    margin: 0.12rem 0 0;
-    flex: 0 0 auto;
+.step-4-removal-locked-row {
+    cursor: default;
 }
 
 .step-4-material-copy {
@@ -799,14 +788,15 @@ button {
 
 .step-4-material-name {
     color: #222222;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 500;
     line-height: 1rem;
+    margin-bottom: 0.4rem;
 }
 
 .step-4-material-reminder {
     color: #818181;
-    font-size: 0.85rem;
+    font-size: 0.87rem;
     line-height: 0.9rem;
 }
 
@@ -814,39 +804,92 @@ button {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    padding: 0.55rem;
+    padding: 1rem;
     border: 1px solid #d0d0d0;
     background: #ffffff;
+    width: 95%;
+    margin-top: 1.2rem;
 }
 
 .step-4-custom-input,
 .step-4-reminder-select {
+    display: block;
     width: 100%;
     min-height: 2.25rem;
-    padding: 0.45rem 0.65rem;
-    border: 1px solid #d0d0d0;
+    padding: 0.8rem;
+    border: 1.9px solid #C7C7C7;
     border-radius: 1.5rem;
-    background: #f0f0f0;
+    background-color: rgb(233, 233, 233);
     color: #555555;
     font: inherit;
-    font-size: 0.72rem;
+    font-size: 0.9rem;
+}
+
+.step-4-reminder-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m3.5 6 4.5 4.5L12.5 6' fill='none' stroke='%23555' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: right 0.8rem center;
 }
 
 .step-4-custom-row {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.35rem;
-    margin-bottom: 0.2rem;
+    gap: 0.55rem;
+    margin-bottom: 1.2rem;
+}
+
+.step-4-custom-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex-direction: row;
 }
 
 .step-4-add-button {
-    padding: 0.35rem 0.8rem;
-    border: 0;
+    padding: 0.5rem 1rem;
+    border: none;
     border-radius: 1rem;
     background: #dfe7ff;
-    color: #222222;
-    font-size: 0.7rem;
+    color: #5c6c9e;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.step-4-add-button:hover {
+    background-color: #c8d1ec;
+}
+
+.step-4-remove-button,
+.step-4-save-changes-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #c7c7c7;
+    border-radius: 1rem;
+    background: #ffffff;
+    color: #555555;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.step-4-remove-button:hover,
+.step-4-save-changes-button:hover {
+    background-color: #eeeeee;
+}
+
+.step-4-status {
+    margin-top: 0.25rem;
+    color: #666666;
+    font-size: 0.75rem;
+}
+
+.step-4-status:empty {
+    display: none;
 }
 
 .step-4-selection-buttons {
@@ -857,7 +900,7 @@ button {
     gap: 0.5rem;
     width: 100%;
     margin: 0.1rem 0 0;
-    padding: 0.45rem 0;
+    padding: 2rem 0;
     background: #f0f0f0;
 }
 
@@ -868,10 +911,40 @@ button {
     font-size: 0.8rem;
 }
 
-.step-4-status {
-    min-height: 1rem;
-    color: #555555;
-    font-size: 0.72rem;
+.step-4-selection-buttons .step-btn-next {
+    border-style: none;
+    padding: 12px 24px;
+    background-color: #4F76FF;
+    color: #ffffff;
+    font-weight: 550;
+    font-size: 1.05rem;
+    border-radius: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    width: 54.8%;
+}
+
+.step-4-selection-buttons .step-btn-next:hover {
+    background-color: #3d63d3;
+}
+
+.step-4-selection-buttons .step-btn-back {
+    border-style: none;
+    padding: 12px 24px;
+    background-color: #b6c8ff;
+    color: #5c6c9e;
+    font-weight: 550;
+    font-size: 1.05rem;
+    border-radius: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    width: 40%;
+}
+
+.step-4-selection-buttons .step-btn-back:hover {
+    background-color: #9eb2ec;
 }
 
 .step-1-error-message:empty,

@@ -376,6 +376,8 @@ const COMMON_MATERIALS = [
     { id: 'hat', name: 'Hat', reminder: 'When UV is high', trigger: 'uv' }
 ];
 
+let removeCustomMaterialsMode = false;
+
 function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (character) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -410,14 +412,38 @@ function saveMaterialIds() {
     localStorage.setItem('healthsyncMaterials', JSON.stringify(selected));
 }
 
-function materialRow(item, selectedIds) {
+function materialRow(item, selectedIds, allowSelection = true) {
     const checked = selectedIds.includes(item.id);
+
+    if (!allowSelection) {
+        return `
+            <div class="step-4-material-row step-4-removal-locked-row" aria-disabled="true">
+                <span class="step-4-material-copy">
+                    <span class="check-heading step-4-material-name">${escapeHtml(item.name)}</span>
+                    <span class="check-subheading step-4-material-reminder">${escapeHtml(item.reminder)}</span>
+                </span>
+            </div>`;
+    }
+
     return `
-        <label class="check-row-1 step-4-material-row">
+        <label class="check-row check-row-1 step-4-material-row">
             <input type="checkbox" data-material-id="${escapeHtml(item.id)}" ${checked ? 'checked' : ''}>
+            <span class="box"></span>
             <span class="step-4-material-copy">
                 <span class="check-heading step-4-material-name">${escapeHtml(item.name)}</span>
                 <span class="check-subheading step-4-material-reminder">${escapeHtml(item.reminder)}</span>
+            </span>
+        </label>`;
+}
+
+function customMaterialRemovalRow(item) {
+    return `
+        <label class="check-row check-row-1 step-4-material-row step-4-remove-row">
+            <input type="checkbox" data-remove-custom-id="${escapeHtml(item.id)}" aria-label="Select ${escapeHtml(item.name)} to remove">
+            <span class="box"></span>
+            <span class="step-4-material-copy">
+                <span class="check-heading step-4-material-name">${escapeHtml(item.name)}</span>
+                <span class="check-subheading step-4-material-reminder">Select this item, then click "Save changes" to remove it.</span>
             </span>
         </label>`;
 }
@@ -437,7 +463,7 @@ function renderMaterials() {
         return `
             <section class="step-4-condition-group">
                 <p class="step-4-group-heading">BECAUSE YOU CHOSE ${escapeHtml(group.label).toUpperCase()}</p>
-                <div class="step-4-material-list">${group.items.map((item) => materialRow(item, selectedIds)).join('')}</div>
+                <div class="step-4-material-list">${group.items.map((item) => materialRow(item, selectedIds, !removeCustomMaterialsMode)).join('')}</div>
             </section>`;
     }).join('');
 
@@ -446,12 +472,58 @@ function renderMaterials() {
         return group ? group.items.map((item) => item.name.toLowerCase()) : [];
     }));
     const commonItems = COMMON_MATERIALS.filter((item) => !conditionItemNames.has(item.name.toLowerCase()));
-    common.innerHTML = commonItems.map((item) => materialRow(item, selectedIds)).join('')
-        + customItems.map((item) => materialRow(item, selectedIds)).join('');
+    common.innerHTML = commonItems.map((item) => materialRow(item, selectedIds, !removeCustomMaterialsMode)).join('')
+        + customItems.map((item) => removeCustomMaterialsMode
+            ? customMaterialRemovalRow(item)
+            : materialRow(item, selectedIds)).join('');
+
+    const removeButton = document.getElementById('remove-custom-items-button');
+    const saveButton = document.getElementById('save-custom-removals-button');
+    if (removeButton) removeButton.textContent = removeCustomMaterialsMode ? 'Cancel removal' : 'Remove item';
+    if (saveButton) saveButton.hidden = !removeCustomMaterialsMode;
 
     document.querySelectorAll('[data-material-id]').forEach((input) => {
         input.addEventListener('change', saveMaterialIds);
     });
+}
+
+function toggleCustomMaterialRemoval() {
+    const status = document.getElementById('materials-status');
+    const customItems = readSavedValue('healthsyncCustomMaterials', []);
+
+    if (!removeCustomMaterialsMode && !customItems.length) {
+        if (status) status.textContent = 'There are no custom items to remove.';
+        return;
+    }
+
+    removeCustomMaterialsMode = !removeCustomMaterialsMode;
+    if (status) {
+        status.textContent = removeCustomMaterialsMode
+            ? 'Select the custom items you want to remove, then save changes.'
+            : '';
+    }
+    renderMaterials();
+}
+
+function saveCustomMaterialRemovals() {
+    const status = document.getElementById('materials-status');
+    const selectedIds = [...document.querySelectorAll('[data-remove-custom-id]:checked')]
+        .map((input) => input.dataset.removeCustomId);
+
+    if (!selectedIds.length) {
+        if (status) status.textContent = 'Select at least one custom item to remove.';
+        return;
+    }
+
+    const idsToRemove = new Set(selectedIds);
+    const customItems = readSavedValue('healthsyncCustomMaterials', []);
+    const remainingItems = customItems.filter((item) => !idsToRemove.has(item.id));
+    const selectedMaterials = getSavedMaterialIds().filter((id) => !idsToRemove.has(id));
+    localStorage.setItem('healthsyncCustomMaterials', JSON.stringify(remainingItems));
+    localStorage.setItem('healthsyncMaterials', JSON.stringify(selectedMaterials));
+    removeCustomMaterialsMode = false;
+    renderMaterials();
+    if (status) status.textContent = '';
 }
 
 function addCustomMaterial() {
@@ -489,5 +561,5 @@ function finishSetup() {
     saveMaterialIds();
     localStorage.setItem('healthsyncSetupComplete', 'true');
     const status = document.getElementById('materials-status');
-    status.textContent = 'Your carry list is saved.';
+    if (status) status.textContent = 'Your carry list is saved.';
 }
