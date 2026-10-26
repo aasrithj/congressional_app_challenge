@@ -36,6 +36,7 @@ button {
     width: 390px;
     height: 844px;
     background: #f0f0f0;
+    border-radius: 28px;
     overflow: hidden;
     position: relative;
     display: flex;
@@ -49,15 +50,6 @@ button {
     overflow-x: hidden;
     scrollbar-width: none;
     -ms-overflow-style: none;
-}
-
-.viewport {
-    height: 100vh;
-    height: 100dvh;
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    padding: 0;
 }
 
 .scroll-area-app::-webkit-scrollbar {
@@ -904,7 +896,7 @@ button {
     display: none;
 }
 
-.step-4-selection-buttons {
+.padded-buttons {
     position: sticky;
     bottom: 0;
     z-index: 10;
@@ -916,14 +908,14 @@ button {
     background: #f0f0f0;
 }
 
-.step-4-selection-buttons .step-btn-back,
-.step-4-selection-buttons .step-btn-next {
+.padded-buttons .step-btn-back,
+.padded-buttons .step-btn-next {
     width: 50%;
     padding: 0.65rem 1rem;
     font-size: 0.8rem;
 }
 
-.step-4-selection-buttons .step-btn-next {
+.padded-buttons .step-btn-next {
     border-style: none;
     padding: 12px 24px;
     background-color: #4F76FF;
@@ -937,11 +929,11 @@ button {
     width: 54.8%;
 }
 
-.step-4-selection-buttons .step-btn-next:hover {
+.padded-buttons .step-btn-next:hover {
     background-color: #3d63d3;
 }
 
-.step-4-selection-buttons .step-btn-back {
+.padded-buttons .step-btn-back {
     border-style: none;
     padding: 12px 24px;
     background-color: #b6c8ff;
@@ -955,7 +947,7 @@ button {
     width: 40%;
 }
 
-.step-4-selection-buttons .step-btn-back:hover {
+.padded-buttons .step-btn-back:hover {
     background-color: #9eb2ec;
 }
 
@@ -1157,7 +1149,6 @@ button {
     corner-shape: squircle;
     background-color: #FFFFFF;
 }
-}
 
 .home-risk-title {
     font-size: 1rem;
@@ -1298,7 +1289,6 @@ button {
     font-size: 0.75rem;
     color: #808080;
     text-decoration: none;
-    width: 10rem;
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -1394,7 +1384,7 @@ button {
 
 .home-bar.now {
     opacity: 1;
-    border: 2px solid #a8a8a8;
+    border: 2px solid #1A1A1A;
 }
 
 .home-bar-labels {
@@ -1481,7 +1471,7 @@ button {
 }
 
 .home-note.home-updated {
-    margin-bottom: 1rem;
+    margin-bottom: -1.5rem;
 }
 
 .home-actions {
